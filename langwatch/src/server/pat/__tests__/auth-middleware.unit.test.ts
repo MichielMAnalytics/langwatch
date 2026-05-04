@@ -61,6 +61,7 @@ describe("extractCredentials", () => {
       expect(extractCredentials(c2)).toBeNull();
     });
 
+    /** @scenario Authorization header from a proxy does not poison X-Auth-Token fallback */
     it("falls back to X-Auth-Token when Basic auth is malformed (no colon)", () => {
       // A corporate proxy may add Authorization: Basic <some-base64> for its
       // own upstream auth. That MUST NOT poison the customer's legitimate
@@ -134,6 +135,7 @@ describe("extractCredentials", () => {
       });
     });
 
+    /** @scenario Empty or whitespace-only Bearer token does not poison X-Auth-Token fallback */
     it("falls back to X-Auth-Token when Bearer is empty", () => {
       const c = mockGetHeader({
         authorization: "Bearer ",
@@ -231,12 +233,14 @@ describe("collectAuthDiagnostics", () => {
     expect(collectAuthDiagnostics(c).forwardedFor).toBe("192.0.2.5");
   });
 
+  /** @scenario extractCredentials returns null because X-Auth-Token was sent empty */
   it("flags hasEmptyAuthToken when the header was sent but empty", () => {
     const c = mockHonoCtx({ headers: { "x-auth-token": "" } });
     const diag = collectAuthDiagnostics(c);
     expect(diag.hasEmptyAuthToken).toBe(true);
   });
 
+  /** @scenario extractCredentials returns null because no auth header was sent */
   it("does NOT flag hasEmptyAuthToken when the header is absent entirely", () => {
     const c = mockHonoCtx({ headers: {} });
     const diag = collectAuthDiagnostics(c);
@@ -251,6 +255,7 @@ describe("collectAuthDiagnostics", () => {
     expect(diag.forwardedFor).toBeNull();
   });
 
+  /** @scenario Diagnostic fields are safe to log */
   it("never includes a raw token value", () => {
     const c = mockHonoCtx({
       headers: {

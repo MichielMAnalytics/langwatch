@@ -16,7 +16,6 @@ Feature: BetterAuth config (unmounted)
   # Provider selection via NEXTAUTH_PROVIDER env
   # ============================================================================
 
-  @unimplemented
   Scenario: Credentials-only on-prem mode
     Given NEXTAUTH_PROVIDER is "email"
     And AUTH0_* envs are not set
@@ -24,6 +23,11 @@ Feature: BetterAuth config (unmounted)
     Then email-and-password signin is enabled
     And no social providers are configured
 
+  # @unimplemented: requires a parameterized re-import of `~/server/better-auth`
+  # under env-mocked conditions. The current unit tests in
+  # `langwatch/src/server/better-auth/__tests__/index.test.ts` exercise a single
+  # env at a time; a per-scenario env-override harness would let us assert each
+  # provider matrix without spinning up a full integration fixture.
   @unimplemented
   Scenario: Auth0 enterprise mode
     Given NEXTAUTH_PROVIDER is "auth0"
@@ -32,6 +36,7 @@ Feature: BetterAuth config (unmounted)
     Then the generic-oauth plugin lists an "auth0" provider
     And email-and-password is still enabled for admin fallback
 
+  # @unimplemented: same env-override harness gap as "Auth0 enterprise mode".
   @unimplemented
   Scenario: Google mode
     Given NEXTAUTH_PROVIDER is "google"
@@ -43,28 +48,24 @@ Feature: BetterAuth config (unmounted)
   # SSO domain + provider matching (ported from NextAuth signIn callback)
   # ============================================================================
 
-  @unimplemented
   Scenario: isSsoProviderMatch — Auth0 prefix match
     Given an organization with ssoProvider "waad|acme-azure-connection"
     And an OAuth account with providerId "auth0" and providerAccountId "waad|acme-azure-connection|user-123"
     When I call isSsoProviderMatch(org, account)
     Then it returns true
 
-  @unimplemented
   Scenario: isSsoProviderMatch — direct provider name match
     Given an organization with ssoProvider "google"
     And an OAuth account with providerId "google" and providerAccountId "google-id-123"
     When I call isSsoProviderMatch(org, account)
     Then it returns true
 
-  @unimplemented
   Scenario: isSsoProviderMatch — wrong provider rejected
     Given an organization with ssoProvider "okta"
     And an OAuth account with providerId "google" and providerAccountId "google-id-123"
     When I call isSsoProviderMatch(org, account)
     Then it returns false
 
-  @unimplemented
   Scenario: isSsoProviderMatch — org without ssoProvider
     Given an organization with ssoProvider null
     And any OAuth account
@@ -75,19 +76,22 @@ Feature: BetterAuth config (unmounted)
   # signIn guards (ported from NextAuth signIn callback)
   # ============================================================================
 
-  @unimplemented
   Scenario: Deactivated user is blocked
     Given a user exists with deactivatedAt set to yesterday
     When that user signs in via any provider
     Then the signin is rejected with an error
 
+  # @unimplemented: the BetterAuth OAuth-callback hook chain is wired but the
+  # guard logic for the "active-session-with-different-email" path lives across
+  # `before*` hooks and a session-cookie check that requires an integration
+  # harness (cookie + BetterAuth handler). Worth a follow-up integration test
+  # in `langwatch/src/server/better-auth/__tests__/`.
   @unimplemented
   Scenario: DIFFERENT_EMAIL_NOT_ALLOWED guard
     Given a logged-in user with email "a@example.com" and an active session cookie
     When an OAuth callback returns a profile with email "b@example.com"
     Then the signin is rejected with a DIFFERENT_EMAIL_NOT_ALLOWED error
 
-  @unimplemented
   Scenario: New user with matching SSO domain joins the SSO org
     Given an organization with ssoDomain "acme.com" exists
     And no user exists with email "new@acme.com"
@@ -96,7 +100,6 @@ Feature: BetterAuth config (unmounted)
     And the user is added to the organization as a MEMBER
     And an Account row is created for the OAuth account
 
-  @unimplemented
   Scenario: Existing user with correct SSO provider auto-links
     Given an organization with ssoDomain "acme.com" and ssoProvider "google" exists
     And a user exists with email "existing@acme.com" and pendingSsoSetup=false
@@ -104,7 +107,6 @@ Feature: BetterAuth config (unmounted)
     Then the Account row is upserted
     And pendingSsoSetup remains false
 
-  @unimplemented
   Scenario: Existing user with wrong SSO provider gets pending flag
     Given an organization with ssoDomain "acme.com" and ssoProvider "okta" exists
     And a user exists with email "existing@acme.com" and pendingSsoSetup=false
@@ -125,7 +127,6 @@ Feature: BetterAuth config (unmounted)
   # active on each request.
   # ============================================================================
 
-  @unimplemented
   Scenario: The BetterAuth admin plugin is intentionally omitted
     Given the BetterAuth instance is initialized
     When I inspect the configured plugins
@@ -137,6 +138,10 @@ Feature: BetterAuth config (unmounted)
   # bcrypt-compatible password verification
   # ============================================================================
 
+  # @unimplemented: bcrypt verify is wired via
+  # `emailAndPassword.password.verify` in `~/server/better-auth/index.ts`,
+  # but a green-path integration test would need a Postgres + Account row
+  # fixture. Tracked for when the integration harness lands.
   @unimplemented
   Scenario: Legacy bcrypt hashes still verify
     Given an existing user has a bcrypt hash from the NextAuth system stored in the database
@@ -144,6 +149,7 @@ Feature: BetterAuth config (unmounted)
     Then BetterAuth's credentials provider verifies the bcrypt hash successfully
     And the signin succeeds
 
+  # @unimplemented: same bcrypt-verify integration harness gap as above.
   @unimplemented
   Scenario: Wrong password is rejected
     Given an existing user has a bcrypt hash
@@ -154,14 +160,12 @@ Feature: BetterAuth config (unmounted)
   # BetterAuth is now the live handler
   #
   # Originally (during phase 1 of the migration) this file tracked a
-  # "NextAuth still live, BetterAuth loaded but unmounted" phase. That
-  # phase is no longer the reality — this PR swaps `/api/auth/[...all].ts`
-  # to mount BetterAuth directly. The scenario is updated to reflect the
-  # post-cutover state. Phase-3 (`phase-3-big-swap.feature`) contains the
-  # detailed cutover assertions.
+  # "NextAuth still live, BetterAuth loaded but unmounted" phase. The
+  # cutover has shipped — BetterAuth handles every `/api/auth/*` route
+  # and NextAuth has been deleted from the tree. This scenario locks in
+  # the post-cutover surface.
   # ============================================================================
 
-  @unimplemented
   Scenario: BetterAuth is the live handler
     Given the BetterAuth instance is initialized
     When I visit `/api/auth/sign-in/email` in dev
