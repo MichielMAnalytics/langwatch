@@ -3,30 +3,35 @@ Feature: Custom prompt tag management
   I want to create, list, and delete custom prompt tags
   So that my team can organize prompt versions beyond the default labels
 
+  # Parity status: 7 of 21 scenarios bound to existing tests in
+  # langwatch/src/server/prompt-config/__tests__/prompt-tag.service.unit.test.ts.
+  # The remaining 14 @unimplemented scenarios are integration/e2e tests that
+  # require Postgres + API harness — deferred per #3458.
+
   Background:
     Given an organization exists with seeded prompt tags "production" and "staging"
     And I am an admin of that organization
 
   # --- Protected tags ---
 
-  @unit @unimplemented
+  @unit
   Scenario: Only "latest" is a protected tag
     When I inspect the PROTECTED_TAGS constant
     Then it contains only "latest"
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation rejects creating a tag named "latest"
     When I validate the tag name "latest"
     Then it fails with a message mentioning "protected"
 
   # --- Seeded tags are regular custom tags ---
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation accepts "production" as a tag name
     When I validate the tag name "production"
     Then it does not throw
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation accepts "staging" as a tag name
     When I validate the tag name "staging"
     Then it does not throw
@@ -107,22 +112,22 @@ Feature: Custom prompt tag management
 
   # --- Validation rules ---
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation rejects empty tag names
     When I validate the tag name ""
     Then it fails with a message mentioning "empty"
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation rejects purely numeric tag names
     When I validate the tag name "42"
     Then it fails with a message mentioning "numeric"
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation rejects uppercase tag names
     When I validate the tag name "CANARY"
     Then it fails with a message mentioning "lowercase"
 
-  @unit @unimplemented
+  @unit
   Scenario: Validation accepts well-formed custom tag names
     When I validate the tag name "canary"
     Then it does not throw

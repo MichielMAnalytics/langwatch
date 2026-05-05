@@ -17,6 +17,7 @@ import { EESubscriptionService, RECENT_INVOICES_LIMIT } from "../services/subscr
 import { InvalidPlanError, OrganizationNotFoundError, SeatBillingUnavailableError } from "../errors";
 import type { SeatEventSubscriptionFns } from "../services/seatEventSubscription";
 import type { SubscriptionRepository } from "../../../src/server/app-layer/subscription/subscription.repository";
+import type { SubscriptionService } from "../../../src/server/app-layer/subscription/subscription.service";
 import type { OrganizationRepository } from "../../../src/server/app-layer/organizations/repositories/organization.repository";
 
 const createMockStripe = () => ({
@@ -138,6 +139,26 @@ describe("EESubscriptionService", () => {
   let organizationRepository: ReturnType<typeof createMockOrganizationRepository>;
   let service: EESubscriptionService;
 
+  describe("interface conformance", () => {
+    /** @scenario "New class implements the same interface as old factory" */
+    it("implements the SubscriptionService app-layer interface", () => {
+      const localService = new EESubscriptionService({
+        prisma: createMockDb() as unknown as PrismaClient,
+        repository: createMockRepository() as unknown as SubscriptionRepository,
+        stripe: createMockStripe() as unknown as Stripe,
+        itemCalculator: createMockItemCalculator(),
+        organizationRepository: createMockOrganizationRepository() as unknown as OrganizationRepository,
+      });
+      const asInterface: SubscriptionService = localService;
+
+      expect(typeof asInterface.updateSubscriptionItems).toBe("function");
+      expect(typeof asInterface.createOrUpdateSubscription).toBe("function");
+      expect(typeof asInterface.createBillingPortalSession).toBe("function");
+      expect(typeof asInterface.getLastNonCancelledSubscription).toBe("function");
+      expect(typeof asInterface.notifyProspective).toBe("function");
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     stripe = createMockStripe();
@@ -156,6 +177,7 @@ describe("EESubscriptionService", () => {
 
   describe("updateSubscriptionItems()", () => {
     describe("when active subscription exists", () => {
+      /** @scenario "EESubscriptionService updates subscription items via Stripe" */
       it("updates subscription items via Stripe", async () => {
         repository.findLastNonCancelled.mockResolvedValue({
           id: "sub_db_1",
@@ -272,6 +294,7 @@ describe("EESubscriptionService", () => {
 
   describe("createOrUpdateSubscription()", () => {
     describe("when cancelling to FREE with existing subscription", () => {
+      /** @scenario "EESubscriptionService cancels subscription when downgrading to free" */
       it("cancels Stripe subscription and updates status via repository", async () => {
         repository.findLastNonCancelled.mockResolvedValue({
           id: "sub_db_1",
@@ -329,6 +352,7 @@ describe("EESubscriptionService", () => {
     });
 
     describe("when creating new subscription", () => {
+      /** @scenario "EESubscriptionService creates checkout for new subscription" */
       it("creates checkout session for new plan", async () => {
         repository.findLastNonCancelled.mockResolvedValue(null);
         repository.createPending.mockResolvedValue({ id: "sub_new" });
@@ -463,6 +487,7 @@ describe("EESubscriptionService", () => {
 
   describe("createBillingPortalSession()", () => {
     describe("when called with valid customer and base URL", () => {
+      /** @scenario "EESubscriptionService creates billing portal session" */
       it("creates portal session with return URL", async () => {
         stripe.billingPortal.sessions.create.mockResolvedValue({
           url: "https://billing.stripe.com/session",
@@ -500,6 +525,7 @@ describe("EESubscriptionService", () => {
 
   describe("notifyProspective()", () => {
     describe("when organization exists", () => {
+      /** @scenario "EESubscriptionService notifies for prospective subscription" */
       it("dispatches prospective notification", async () => {
         organizationRepository.findNameById.mockResolvedValue({
           id: "org_123",

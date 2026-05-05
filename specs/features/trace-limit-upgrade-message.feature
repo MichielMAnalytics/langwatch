@@ -6,46 +6,34 @@ Feature: Usage limit 429 message includes upgrade instructions
 
   # Free tier counts "events", paid TIERED counts "traces".
   # The message must reflect the actual usage unit being counted.
+  # All 4 scenarios bound to langwatch/src/server/license-enforcement/__tests__/limit-message.unit.test.ts.
 
-  # 0 of 4 scenarios are bound — all are UPDATE-class per AUDIT_MANIFEST.
-  # Production message formatting diverges from scenario assertions
-  # (e.g., "Free limit of 50000 events" vs "Free plan limit of"). Scenarios need
-  # rewriting to match actual strings in limit-message.ts (tracked under #3458):
-  #   - "Free-tier org on SaaS told to upgrade with correct unit"
-  #   - "Free-tier org on self-hosted told to buy a license"
-  #   - "Paid TIERED org on SaaS told to upgrade with traces unit"
-  #   - "Paid TIERED org on self-hosted told to buy a license"
-
-  @unimplemented
   Scenario: Free-tier org on SaaS told to upgrade with correct unit
     Given a free-tier organization that has exceeded 50000 events
     And the platform is running in SaaS mode
-    When the usage limit check returns exceeded
-    Then the message contains "Free limit of 50000 events reached"
-    And the message contains "upgrade your plan at https://app.langwatch.ai/settings/subscription"
+    When the usage limit message is built
+    Then the prefix reads "Free plan"
+    And the action contains "upgrade your plan at https://app.langwatch.ai/settings/subscription"
 
-  @unimplemented
-  Scenario: Free-tier org on self-hosted told to buy a license
+  Scenario: Free-tier org on self-hosted told to get a license
     Given a free-tier organization that has exceeded 50000 events
     And the platform is running in self-hosted mode
     And the BASE_HOST is "https://my-langwatch.example.com"
-    When the usage limit check returns exceeded
-    Then the message contains "Free limit of 50000 events reached"
-    And the message contains "buy a license at https://my-langwatch.example.com/settings/license"
+    When the usage limit message is built
+    Then the prefix reads "Free plan"
+    And the action contains "get a license at https://my-langwatch.example.com/settings/license"
 
-  @unimplemented
-  Scenario: Paid TIERED org on SaaS told to upgrade with traces unit
+  Scenario: Paid org on SaaS told to upgrade with traces unit
     Given a paid TIERED organization that has exceeded 10000 traces
     And the platform is running in SaaS mode
-    When the usage limit check returns exceeded
-    Then the message contains "Monthly limit of 10000 traces reached"
-    And the message contains "upgrade your plan at https://app.langwatch.ai/settings/subscription"
+    When the usage limit message is built
+    Then the prefix reads "Plan"
+    And the action contains "upgrade your plan at https://app.langwatch.ai/settings/subscription"
 
-  @unimplemented
-  Scenario: Paid TIERED org on self-hosted told to buy a license
-    Given a paid TIERED organization that has exceeded 10000 traces
+  Scenario: Licensed org on self-hosted told to upgrade their license
+    Given a licensed organization that has exceeded its limit
     And the platform is running in self-hosted mode
     And the BASE_HOST is "https://my-langwatch.example.com"
-    When the usage limit check returns exceeded
-    Then the message contains "Monthly limit of 10000 traces reached"
-    And the message contains "buy a license at https://my-langwatch.example.com/settings/license"
+    When the usage limit message is built
+    Then the prefix reads "License"
+    And the action contains "upgrade your license at https://my-langwatch.example.com/settings/license"

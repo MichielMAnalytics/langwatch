@@ -49,6 +49,7 @@ describe("RoleService Tests", () => {
   });
 
   describe("getAllRoles", () => {
+    /** @scenario "Non-enterprise org can list custom roles" */
     it("should return all custom roles for organization", async () => {
       const mockRoles = [
         {
@@ -103,6 +104,7 @@ describe("RoleService Tests", () => {
   });
 
   describe("getRoleById", () => {
+    /** @scenario "Non-enterprise org can view a custom role" */
     it("should return role by ID", async () => {
       const mockRole = {
         id: "role-1",
