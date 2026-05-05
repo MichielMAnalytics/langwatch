@@ -541,6 +541,7 @@ describe("SuiteService", () => {
     describe("given a suite with a prompt target referencing an existing config", () => {
       describe("when the suite run is triggered", () => {
         /** @scenario "Suite run succeeds when prompt config exists in project" */
+        /** @scenario "Suite run succeeds when prompt config is org-scoped" */
         it("resolves via llmConfigRepository and delegates", async () => {
           const { service, llmConfigRepo } = createService();
           const suite = makeSuite({
@@ -567,6 +568,7 @@ describe("SuiteService", () => {
     describe("given a suite with a deleted prompt target", () => {
       describe("when the suite run is triggered", () => {
         /** @scenario "Suite run fails when prompt config is soft-deleted" */
+        /** @scenario "Suite run fails when prompt config belongs to another organization" */
         it("throws InvalidTargetReferencesError (not AllTargetsArchivedError)", async () => {
           const { service } = createService({
             llmConfigRepository: {
