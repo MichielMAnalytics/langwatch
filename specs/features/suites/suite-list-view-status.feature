@@ -43,7 +43,7 @@ Feature: Suite list view status with criteria count
     When the status label is computed
     Then the label reads "passed"
 
-  @unit @unimplemented
+  @unit
   Scenario: Run with zero criteria shows status without count
     Given a scenario run with status "failed"
     And the run has 0 met criteria and 0 unmet criteria
