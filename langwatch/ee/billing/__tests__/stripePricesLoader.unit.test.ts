@@ -32,6 +32,7 @@ describe("stripeCatalog", () => {
   });
 
   describe("resolveStripePriceMap()", () => {
+    /** @scenario "Billing runtime resolves test price ids outside production" */
     it("resolves test mode mappings", () => {
       const parsed = parseStripePricesFile(stripeCatalogData);
       const resolved = resolveStripePriceMap(parsed, "test");
@@ -41,12 +42,35 @@ describe("stripeCatalog", () => {
       }
     });
 
+    /** @scenario "Billing runtime resolves live price ids in production" */
     it("resolves live mode mappings", () => {
       const parsed = parseStripePricesFile(stripeCatalogData);
       const resolved = resolveStripePriceMap(parsed, "live");
 
       for (const key of STRIPE_PRICE_NAMES) {
         expect(resolved[key]).toBe(parsed.mapping[key].live);
+      }
+    });
+
+    /** @scenario "Extra development prices do not break required mapping validation" */
+    it("accepts catalogs with additional non-required prices alongside required mappings", () => {
+      const augmented = {
+        ...stripeCatalogData,
+        prices: {
+          ...stripeCatalogData.prices,
+          DEV_ONLY_PRICE_FOR_LOCAL_TESTING: {
+            test: { unit_amount: 100 },
+            live: null,
+          },
+        },
+      };
+
+      expect(() => parseStripePricesFile(augmented)).not.toThrow();
+
+      const parsed = parseStripePricesFile(augmented);
+      const resolved = resolveStripePriceMap(parsed, "test");
+      for (const key of STRIPE_PRICE_NAMES) {
+        expect(resolved[key]).toBeDefined();
       }
     });
 
