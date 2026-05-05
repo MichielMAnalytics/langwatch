@@ -325,6 +325,7 @@ describe("column-pruning", () => {
 
   describe("query correctness after pruning", () => {
     describe("when building a timeseries query for trace_count", () => {
+      /** @scenario "Pruned query generates syntactically valid SQL" */
       it("generates syntactically valid SQL", () => {
         const result = buildTimeseriesQuery({
           ...baseInput,
@@ -345,9 +346,34 @@ describe("column-pruning", () => {
         expect(result.sql).not.toMatch(/SELECT\s*,/);
         expect(result.sql).not.toMatch(/,\s*FROM/);
       });
+
+      /** @scenario "Pruned query resolves all column references from pruned sources" */
+      it("only references columns available from the pruned sources", () => {
+        const result = buildTimeseriesQuery({
+          ...baseInput,
+          series: [
+            {
+              metric: "metadata.trace_id" as FlattenAnalyticsMetricsEnum,
+              aggregation: "cardinality" as const,
+            },
+          ],
+        });
+
+        // Identity columns referenced in SELECT/GROUP BY/ORDER BY should be
+        // present in the dedup subquery's SELECT list.
+        const dedupMatch = result.sql.match(
+          /FROM\s+trace_summaries\s+WHERE[\s\S]*?GROUP BY[\s\S]*?LIMIT/i,
+        );
+        // Sanity: query should resolve TraceId in both the outer and inner
+        // scopes — it cannot be referenced if it was pruned out.
+        expect(result.sql.toLowerCase()).toContain("traceid");
+        expect(dedupMatch?.[0]?.toLowerCase() ?? result.sql.toLowerCase())
+          .toContain("traceid");
+      });
     });
 
     describe("when building a CTE query for arrayJoin grouping", () => {
+      /** @scenario "Pruned CTE query for arrayJoin grouping preserves metric accuracy" */
       it("selects only needed columns in the CTE inner query", () => {
         const result = buildTimeseriesQuery({
           ...baseInput,

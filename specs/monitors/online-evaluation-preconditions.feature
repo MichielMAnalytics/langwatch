@@ -54,7 +54,7 @@ Feature: Online Evaluation Preconditions Renewal
   # In-Memory Trace Matching
   # ────────────────────────────────────────────
 
-  @unit @unimplemented
+  @unit
   Scenario: Origin "is" application matches explicit "application" plus missing origin (backward-compat)
     Given a precondition: traces.origin is "application"
     When a trace arrives with langwatch.origin = "application"
@@ -98,7 +98,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with error null
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: Nested key filter - metadata.value with key
     Given a precondition: metadata.value key="environment" is "production"
     When a trace arrives with custom metadata { environment: "production" }
@@ -116,7 +116,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with custom metadata { deployment_tag: "stable-v1" }
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: Topics filter matches topic ID
     Given a precondition: topics.topics is "billing"
     When a trace arrives with topic_id "billing"
@@ -134,7 +134,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with satisfaction_score -0.5
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: All preconditions must pass (AND logic)
     Given preconditions:
       | field         | rule     | value       |
@@ -147,13 +147,13 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with origin "simulation" and input "I need help"
     Then the evaluation is skipped
 
-  @unit @unimplemented
+  @unit
   Scenario: Missing field values fail "is" and "contains" checks
     Given a precondition: metadata.user_id is "admin"
     When a trace arrives with no user_id set
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: Missing field values pass "not_contains" checks
     Given a precondition: metadata.user_id not_contains "admin"
     When a trace arrives with no user_id set
@@ -219,7 +219,7 @@ Feature: Online Evaluation Preconditions Renewal
   # Backward Compatibility
   # ────────────────────────────────────────────
 
-  @unit @unimplemented
+  @unit
   Scenario: Existing preconditions with old fields still work
     Given a monitor with legacy preconditions:
       | field           | rule         | value      |

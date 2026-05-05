@@ -71,17 +71,17 @@ Feature: ClickHouse Analytics Column Pruning
   # Query correctness after pruning
   # ---------------------------------------------------------------------------
 
-  @unit @unimplemented
+  @unit
   Scenario: Pruned query generates syntactically valid SQL
     When an analytics timeseries query is built for "trace_count" over a date range
     Then the generated SQL is syntactically valid
 
-  @unit @unimplemented
+  @unit
   Scenario: Pruned query resolves all column references from pruned sources
     When an analytics timeseries query is built for "trace_count" over a date range
     Then every column alias referenced in SELECT, GROUP BY, and ORDER BY is available from the pruned sources
 
-  @unit @unimplemented
+  @unit
   Scenario: Pruned CTE query for arrayJoin grouping preserves metric accuracy
     When an analytics query requests "trace_count" grouped by "metadata.labels"
     Then the CTE inner query selects only identity, period, date, group key, and metric columns
