@@ -55,6 +55,7 @@ describe("dataplane-s3", () => {
 
   describe("parsePrivateS3EnvVars", () => {
     describe("when valid JSON env vars are set", () => {
+      /** @scenario "Parse private S3 config from env var" */
       it("parses a single org config", async () => {
         process.env["DATAPLANE_S3__acme__org123"] = VALID_CONFIG;
 
@@ -121,6 +122,7 @@ describe("dataplane-s3", () => {
     });
 
     describe("when invalid JSON env var is set", () => {
+      /** @scenario "Invalid JSON in S3 env var is logged and skipped" */
       it("skips the invalid entry and logs a warning", async () => {
         process.env["DATAPLANE_S3__bad__org999"] = "not-json";
 
@@ -168,6 +170,7 @@ describe("dataplane-s3", () => {
 
   describe("getS3ConfigForOrganization", () => {
     describe("when org has a private S3 configured", () => {
+      /** @scenario "Org with private S3 gets dedicated config" */
       it("returns the private config", async () => {
         process.env["DATAPLANE_S3__acme__org123"] = VALID_CONFIG;
 
@@ -184,6 +187,7 @@ describe("dataplane-s3", () => {
     });
 
     describe("when org has no private S3 configured", () => {
+      /** @scenario "Org without private S3 gets shared config" */
       it("returns null", async () => {
         const { getS3ConfigForOrganization } = await import(
           "../dataplane-s3"
