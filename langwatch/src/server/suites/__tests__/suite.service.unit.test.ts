@@ -154,6 +154,7 @@ describe("SuiteService", () => {
 
   describe("calculateJobCount()", () => {
     describe("given 3 scenarios, 2 targets, and repeat count 1", () => {
+      /** @scenario "Job count reflects only active scenarios and targets" */
       it("returns 6 jobs", () => {
         const result = SuiteService.calculateJobCount({
           scenarioCount: 3,
@@ -319,6 +320,7 @@ describe("SuiteService", () => {
 
     describe("given a suite with mixed active and archived scenarios", () => {
       describe("when the suite run is triggered", () => {
+        /** @scenario "Filters out archived scenarios from a reference list" */
         it("passes only active scenario IDs to suiteRunService", async () => {
           const archivedAt = new Date();
           const { service, suiteRunService } = createService({
@@ -352,6 +354,7 @@ describe("SuiteService", () => {
 
     describe("given a suite with mixed active and archived targets", () => {
       describe("when the suite run is triggered", () => {
+        /** @scenario "Filters out archived targets from a reference list" */
         it("passes only active targets to suiteRunService", async () => {
           const archivedAt = new Date();
           const { service, suiteRunService } = createService({
@@ -386,6 +389,7 @@ describe("SuiteService", () => {
 
     describe("given all scenarios in a suite are archived", () => {
       describe("when the suite run is triggered", () => {
+        /** @scenario "Throws AllScenariosArchivedError when every scenario is archived" */
         it("throws AllScenariosArchivedError", async () => {
           const archivedAt = new Date();
           const { service, suiteRunService } = createService({

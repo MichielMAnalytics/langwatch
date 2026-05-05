@@ -97,17 +97,18 @@ Feature: Archived Dependency Exclusion from Suite Runs
   # Unit: Filtering Logic
   # ============================================================================
 
-  @unit @unimplemented
+  @unit
   Scenario: Filters out archived scenarios from a reference list
     Given a suite with three scenarios where one is archived
     When the active scenarios are resolved
     Then only the two non-archived scenarios are returned
 
-  @unit @unimplemented
-  Scenario: Returns empty list when all scenarios are archived
+  @unit
+  Scenario: Throws AllScenariosArchivedError when every scenario is archived
     Given a suite with two scenarios that are both archived
-    When the active scenarios are resolved
-    Then an empty list is returned
+    When the suite run is triggered
+    Then AllScenariosArchivedError is thrown
+    And no run is started
 
   @unit @unimplemented
   Scenario: Returns all scenarios when none are archived
@@ -115,13 +116,13 @@ Feature: Archived Dependency Exclusion from Suite Runs
     When the active scenarios are resolved
     Then both scenarios are returned
 
-  @unit @unimplemented
+  @unit
   Scenario: Filters out archived targets from a reference list
     Given a suite with two targets where one is archived
     When the active targets are resolved
     Then only the non-archived target is returned
 
-  @unit @unimplemented
+  @unit
   Scenario: Job count reflects only active scenarios and targets
     Given a suite with 3 scenarios, 2 targets, and repeat count 1
     And 1 scenario is archived and 1 target is archived
