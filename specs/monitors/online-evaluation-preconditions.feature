@@ -42,7 +42,7 @@ Feature: Online Evaluation Preconditions Renewal
     Then preconditions accept all filter fields plus "input" and "output"
     And each field uses the registry name as its label
 
-  @unit @unimplemented
+  @unit
   Scenario: Allowed rules derive from field characteristics
     Then text-like fields (input, output, metadata.user_id, metadata.thread_id, etc) support: is, contains, not_contains, matches_regex
     And boolean fields (traces.error, annotations.hasAnnotation) support: is
