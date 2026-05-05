@@ -42,6 +42,7 @@ describe("wrapWithDefaultSettings", () => {
   });
 
   describe("when calling query with caller-provided clickhouse_settings", () => {
+    /** @scenario "Memory safety setting does not override explicit per-query settings" */
     it("merges defaults with caller overrides taking precedence", async () => {
       const mock = createMockClient();
       const wrapped = wrapWithDefaultSettings(mock);

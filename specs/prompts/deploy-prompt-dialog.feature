@@ -1,6 +1,6 @@
 Feature: Deploy Prompt Dialog
   As a LangWatch user
-  I want a dialog to assign prompt versions to environment labels
+  I want a dialog to assign prompt versions to environment tags
   So that I can control which version is served in each environment from the UI
 
   Background:
@@ -18,14 +18,14 @@ Feature: Deploy Prompt Dialog
     And the description reads "Use tags to get specific prompt version via SDK. Prompt tagged as Production is returned by default."
     And I see the prompt slug "pizza-prompt" with a copy button
 
-  @integration @unimplemented
-  Scenario: Fetch all labels for a prompt config
+  @integration
+  Scenario: Fetch all tags for a prompt config
     Given "pizza-prompt" has production=v2 and staging=v3
-    When I call getLabelsForConfig with configId for "pizza-prompt"
-    Then I receive two label records: production pointing to v2, staging pointing to v3
+    When I call getTagsForConfig with configId for "pizza-prompt"
+    Then I receive two tag assignment records: production pointing to v2, staging pointing to v3
 
-  @unit @unimplemented
-  Scenario: getLabelsForConfig returns empty when no labels assigned
-    Given "pizza-prompt" has no labels assigned
-    When I call getLabelsForConfig with configId for "pizza-prompt"
+  @unit
+  Scenario: getTagsForConfig returns empty when no tags assigned
+    Given "pizza-prompt" has no tags assigned
+    When I call getTagsForConfig with configId for "pizza-prompt"
     Then I receive an empty list

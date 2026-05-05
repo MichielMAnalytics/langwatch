@@ -91,13 +91,13 @@ Feature: ClickHouse Analytics Column Pruning
   # ClickHouse memory safety net
   # ---------------------------------------------------------------------------
 
-  @integration @unimplemented
+  @integration
   Scenario: Analytics queries include a memory spill-to-disk safety setting
     When any analytics query is executed against ClickHouse
     Then the query is sent with a max_bytes_before_external_group_by setting
     So that large GROUP BY operations spill to disk instead of exceeding memory
 
-  @integration @unimplemented
+  @integration
   Scenario: Memory safety setting does not override explicit per-query settings
     When a query is executed with an explicit clickhouse_settings override
     Then the override takes precedence over the default memory safety setting
