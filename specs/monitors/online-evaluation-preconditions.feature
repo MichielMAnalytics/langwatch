@@ -54,7 +54,7 @@ Feature: Online Evaluation Preconditions Renewal
   # In-Memory Trace Matching
   # ────────────────────────────────────────────
 
-  @unit @unimplemented
+  @unit
   Scenario: Origin "is" application matches only explicit application origin
     Given a precondition: traces.origin is "application"
     When a trace arrives with langwatch.origin = "application"
@@ -66,7 +66,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with langwatch.origin = "evaluation"
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: "is" rule on text fields does case-insensitive exact match
     Given a precondition: input is "Hello World"
     When a trace arrives with input "hello world"
@@ -74,7 +74,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with input "Hello World!"
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: "is" rule on array fields matches if value is in array
     Given a precondition: metadata.labels is "production"
     When a trace arrives with labels ["production", "api"]
@@ -82,7 +82,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with labels ["staging"]
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: "is" on spans.model matches if ANY span has that model
     Given a precondition: spans.model is "gpt-4"
     When a trace arrives with spans [llm(model="gpt-4"), llm(model="gpt-3.5")]
@@ -90,7 +90,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with spans [llm(model="claude-3")]
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: "is" on traces.error matches error presence
     Given a precondition: traces.error is "true"
     When a trace arrives with error present
@@ -98,7 +98,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with error null
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: Nested key filter - metadata.value with key
     Given a precondition: metadata.value key="environment" is "production"
     When a trace arrives with custom metadata { environment: "production" }
@@ -116,7 +116,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with custom metadata { deployment_tag: "stable-v1" }
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: Topics filter matches topic ID
     Given a precondition: topics.topics is "billing"
     When a trace arrives with topic_id "billing"
@@ -134,7 +134,7 @@ Feature: Online Evaluation Preconditions Renewal
     When a trace arrives with satisfaction_score -0.5
     Then the precondition fails
 
-  @unit @unimplemented
+  @unit
   Scenario: All preconditions must pass (AND logic)
     Given preconditions:
       | field         | rule     | value       |
