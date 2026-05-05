@@ -12,6 +12,7 @@ describe("generateEvaluatorSlug", () => {
     expect(slug).toMatch(/^safety-[a-z0-9]{5}$/);
   });
 
+  /** @scenario "Handle special characters in name" */
   it("should handle names with special characters", () => {
     const slug = generateEvaluatorSlug("LLM Judge (v2.0) - Beta!");
     // slugify with strict: true removes special chars (dots are removed, not converted)
@@ -56,12 +57,14 @@ describe("generateEvaluatorSlug", () => {
     );
   });
 
+  /** @scenario "Handle empty or whitespace-only names" */
   it("should throw error for whitespace-only name", () => {
     expect(() => generateEvaluatorSlug("   ")).toThrow(
       "Evaluator name cannot be empty",
     );
   });
 
+  /** @scenario "Handle very long names" */
   it("should truncate very long names", () => {
     const longName = "A".repeat(100);
     const slug = generateEvaluatorSlug(longName);
