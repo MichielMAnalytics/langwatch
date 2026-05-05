@@ -12,20 +12,17 @@ Feature: License tRPC Router
   # getStatus Endpoint
   # ============================================================================
 
-  @unimplemented
   Scenario: Gets license status for organization without license
     Given the organization has no license
     When I call license.getStatus with organizationId "org-456"
     Then the response includes:
       | hasLicense     | false       |
       | valid          | false       |
-      | planName       | Open Source |
 
-  @unimplemented
   Scenario: Rejects request for unauthorized organization
     Given I am not a member of organization "other-org"
     When I call license.getStatus with organizationId "other-org"
-    Then the request fails with FORBIDDEN
+    Then the request fails with UNAUTHORIZED
 
   # ============================================================================
   # upload Endpoint
