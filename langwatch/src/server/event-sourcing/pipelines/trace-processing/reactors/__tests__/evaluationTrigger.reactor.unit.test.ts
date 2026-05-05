@@ -109,6 +109,7 @@ describe("evaluationTrigger reactor", () => {
   });
 
   describe("when trace has explicit application origin", () => {
+    /** @scenario "Evaluation trigger runs on traces with explicit application origin" */
     it("dispatches evaluation commands", async () => {
       const deps = createDeps();
       const reactor = createEvaluationTriggerReactor(deps);
@@ -124,6 +125,7 @@ describe("evaluationTrigger reactor", () => {
   });
 
   describe("when trace has non-application origin", () => {
+    /** @scenario "Evaluation trigger dispatches for any known origin (preconditions filter)" */
     it("dispatches for origin 'simulation' (preconditions handle filtering)", async () => {
       const deps = createDeps();
       const reactor = createEvaluationTriggerReactor(deps);
@@ -150,6 +152,7 @@ describe("evaluationTrigger reactor", () => {
   });
 
   describe("when trace has no origin", () => {
+    /** @scenario "Evaluation trigger skips traces with empty origin and no SDK info" */
     it("returns early without dispatching evaluations", async () => {
       const deps = createDeps();
       const reactor = createEvaluationTriggerReactor(deps);
