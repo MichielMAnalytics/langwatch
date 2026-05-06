@@ -137,7 +137,7 @@ function SignInForm() {
   return (
     <>
       <Box position="fixed" top={4} right={4} zIndex={1}>
-        <BoxdLogoIcon size={36} />
+        <BoxdLogoIcon size={56} />
       </Box>
       <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
       {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
