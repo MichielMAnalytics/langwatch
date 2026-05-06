@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { HorizontalFormControl } from "../../components/HorizontalFormControl";
 import { LogoIcon } from "../../components/icons/LogoIcon";
+import { BoxdLogoIcon } from "../../components/icons/BoxdLogoIcon";
 import { toaster } from "../../components/ui/toaster";
 import { usePublicEnv } from "../../hooks/usePublicEnv";
 import { normalizeErrorCode, SignInError } from "./error";
@@ -141,6 +142,7 @@ function SignInForm() {
           <Card.Header>
             <HStack gap={4}>
               <LogoIcon width={30.69} height={42} />
+              <BoxdLogoIcon size={36} />
               <Heading size="lg" as="h1">
                 Sign in
               </Heading>
