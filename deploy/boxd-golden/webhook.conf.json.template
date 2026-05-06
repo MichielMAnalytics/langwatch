@@ -23,5 +23,63 @@
         }
       ]
     }
+  },
+  {
+    "id": "preview",
+    "execute-command": "/home/boxd/langwatch/scripts/preview-handler.sh",
+    "command-working-directory": "/home/boxd/langwatch",
+    "response-message": "queued",
+    "include-command-output-in-response": false,
+    "pass-arguments-to-command": [
+      { "source": "payload", "name": "comment.user.login" },
+      { "source": "payload", "name": "issue.number" },
+      { "source": "payload", "name": "repository.full_name" }
+    ],
+    "trigger-rule": {
+      "and": [
+        {
+          "match": {
+            "type": "payload-hmac-sha256",
+            "secret": "@WEBHOOK_SECRET@",
+            "parameter": { "source": "header", "name": "X-Hub-Signature-256" }
+          }
+        },
+        {
+          "match": {
+            "type": "value",
+            "value": "issue_comment",
+            "parameter": { "source": "header", "name": "X-GitHub-Event" }
+          }
+        },
+        {
+          "match": {
+            "type": "value",
+            "value": "created",
+            "parameter": { "source": "payload", "name": "action" }
+          }
+        },
+        {
+          "match": {
+            "type": "regex",
+            "regex": "^/preview\\b",
+            "parameter": { "source": "payload", "name": "comment.body" }
+          }
+        },
+        {
+          "or": [
+            { "match": { "type": "value", "value": "OWNER", "parameter": { "source": "payload", "name": "comment.author_association" } } },
+            { "match": { "type": "value", "value": "MEMBER", "parameter": { "source": "payload", "name": "comment.author_association" } } },
+            { "match": { "type": "value", "value": "COLLABORATOR", "parameter": { "source": "payload", "name": "comment.author_association" } } }
+          ]
+        },
+        {
+          "match": {
+            "type": "regex",
+            "regex": ".+",
+            "parameter": { "source": "payload", "name": "issue.pull_request.url" }
+          }
+        }
+      ]
+    }
   }
 ]
