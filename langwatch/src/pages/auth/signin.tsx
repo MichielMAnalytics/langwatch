@@ -135,14 +135,17 @@ function SignInForm() {
   };
 
   return (
-    <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
+    <>
+      <Box position="fixed" top={4} right={4} zIndex={1}>
+        <BoxdLogoIcon size={36} />
+      </Box>
+      <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
       {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card.Root>
           <Card.Header>
             <HStack gap={4}>
               <LogoIcon width={30.69} height={42} />
-              <BoxdLogoIcon size={36} />
               <Heading size="lg" as="h1">
                 Sign in
               </Heading>
@@ -200,6 +203,7 @@ function SignInForm() {
           </Card.Body>
         </Card.Root>
       </form>
-    </Container>
+      </Container>
+    </>
   );
 }
