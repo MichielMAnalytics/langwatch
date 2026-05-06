@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.3.1](https://github.com/langwatch/langwatch/compare/langwatch@v3.3.0...langwatch@v3.3.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* **licensing:** exclude archived projects from license-limit count ([#3882](https://github.com/langwatch/langwatch/issues/3882)) ([8981125](https://github.com/langwatch/langwatch/commit/8981125b429b3fcb555a2bdb08c3623d4315c20c))
+* **settings:** surface provider-default mismatch instead of silent no-op ([#3785](https://github.com/langwatch/langwatch/issues/3785)) ([#3852](https://github.com/langwatch/langwatch/issues/3852)) ([7e7dc45](https://github.com/langwatch/langwatch/commit/7e7dc4508199d63e9417132ef449fbcf756de902))
+* **traces-v2:** trace-explorer v2 bug bash + OR-group viz polish ([#3794](https://github.com/langwatch/langwatch/issues/3794)) ([bad5067](https://github.com/langwatch/langwatch/commit/bad5067c079ea90e156e5b25f03308406bec8f6d))
+
+
+### Miscellaneous
+
+* **deps:** bump the uv group across 1 directory with 2 updates ([#3883](https://github.com/langwatch/langwatch/issues/3883)) ([db32b36](https://github.com/langwatch/langwatch/commit/db32b360b336c36f04e77d8592b36712b0113a40))
+* **deps:** update sentry-sdk[fastapi] requirement from &lt;2,&gt;=1.45.1 to &gt;=2.58.0,&lt;3 in /langwatch_nlp ([#2084](https://github.com/langwatch/langwatch/issues/2084)) ([39ec773](https://github.com/langwatch/langwatch/commit/39ec7730ffae3e59ef399e4ba8654cfa50da8671))
+* **deps:** update sentry-sdk[fastapi] requirement in /langwatch_nlp ([39ec773](https://github.com/langwatch/langwatch/commit/39ec7730ffae3e59ef399e4ba8654cfa50da8671))
+
 ## [3.3.0](https://github.com/langwatch/langwatch/compare/langwatch@v3.2.1...langwatch@v3.3.0) (2026-05-05)
 
 
