@@ -16,12 +16,17 @@ set -euo pipefail
 APP_PORT=${APP_PORT:-5560}
 COMPOSE="docker compose -f compose.dev.yml"
 
-PREV_SHA=$(git rev-parse HEAD@{1} 2>/dev/null || echo "")
 HEAD_SHA=$(git rev-parse HEAD)
 
-if [ -z "$PREV_SHA" ] || [ "$PREV_SHA" = "$HEAD_SHA" ]; then
-  # First deploy (no reflog) or no-op fetch — be safe and restart.
-  echo "no diff context (PREV_SHA='$PREV_SHA') — defaulting to restart"
+# `git checkout -B main origin/main` writes two reflog entries at the same SHA
+# (branch reset + checkout), so HEAD@{1} is the new commit, not the previous
+# one. Walk the reflog until we find an entry that differs from HEAD.
+PREV_SHA=$(git reflog HEAD --format='%H' 2>/dev/null \
+  | awk -v cur="$HEAD_SHA" '$1!=cur {print $1; exit}')
+
+if [ -z "$PREV_SHA" ]; then
+  # First deploy (no reflog history before HEAD) — be safe and restart.
+  echo "no prior deployed commit found in reflog — defaulting to restart"
   CHANGED=""
   ACTION="restart"
 else
