@@ -51,6 +51,34 @@ case "$PERM" in
     ;;
 esac
 
+# Don't fork a golden that's mid-deploy or just-deployed — the fork
+# would inherit the in-progress state.
+LOCK=/tmp/golden-sync.lock
+LAST=/tmp/golden-sync.last
+COOLDOWN_S=30
+NOW=$(date +%s)
+COOLDOWN_REASON=""
+
+if [ -f "$LOCK" ]; then
+  AGE=$((NOW - $(stat -c %Y "$LOCK" 2>/dev/null || echo "$NOW")))
+  if [ "$AGE" -lt 600 ]; then
+    COOLDOWN_REASON="a golden deploy is in progress (started ${AGE}s ago)"
+  fi
+fi
+if [ -z "$COOLDOWN_REASON" ] && [ -f "$LAST" ]; then
+  AGE=$((NOW - $(cat "$LAST" 2>/dev/null || echo 0)))
+  if [ "$AGE" -lt "$COOLDOWN_S" ]; then
+    COOLDOWN_REASON="golden was updated ${AGE}s ago, give it ~$((COOLDOWN_S-AGE))s to settle"
+  fi
+fi
+
+if [ -n "$COOLDOWN_REASON" ]; then
+  gh pr comment "$PR_NUMBER" --repo "$REPO" --body \
+    "@$COMMENTER ⏸ $COOLDOWN_REASON. Try \`/boxd-preview\` again in a moment."
+  echo "  cooldown: $COOLDOWN_REASON — bounced"
+  exit 0
+fi
+
 # Resolve PR branch + target VM name.
 PR_BRANCH=$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq .head.ref)
 VM_NAME="langwatch-pr-$PR_NUMBER"

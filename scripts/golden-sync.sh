@@ -27,6 +27,15 @@ if [ "$LOCAL" = "$REMOTE" ]; then
   exit 0
 fi
 
+# Mark deploy in progress so concurrent /boxd-preview triggers can hold
+# off until we settle. Lock cleared on any exit; "last completed" is
+# only written after boxd-deploy.sh finishes successfully.
+LOCK=/tmp/golden-sync.lock
+LAST=/tmp/golden-sync.last
+touch "$LOCK"
+trap 'rm -f "$LOCK"' EXIT
+
 echo "$(date -Is) sync: $LOCAL -> $REMOTE on $BRANCH"
 git checkout -B "$BRANCH" "origin/$BRANCH"
 bash scripts/boxd-deploy.sh
+date +%s > "$LAST"
