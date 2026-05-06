@@ -37,24 +37,30 @@ if [ -z "${WEBHOOK_SECRET:-}" ]; then
   fi
 fi
 echo "$WEBHOOK_SECRET" | sudo tee /etc/golden-webhook-secret >/dev/null
-sudo chmod 600 /etc/golden-webhook-secret
+sudo chown root:boxd /etc/golden-webhook-secret
+sudo chmod 640 /etc/golden-webhook-secret
 
 # 4. Render the webhook config with the secret substituted in.
 echo "==> writing /etc/golden-webhook.conf.json"
 sudo sed "s|@WEBHOOK_SECRET@|$WEBHOOK_SECRET|" \
   "$HERE/webhook.conf.json.template" \
   | sudo tee /etc/golden-webhook.conf.json >/dev/null
-sudo chmod 600 /etc/golden-webhook.conf.json
+sudo chown root:boxd /etc/golden-webhook.conf.json
+sudo chmod 640 /etc/golden-webhook.conf.json
 
-# 5. Log file for the async sync's stdout/stderr.
-sudo touch /var/log/golden-sync.log
-sudo chown boxd:boxd /var/log/golden-sync.log
+# 5. Log files for the async handlers (deploy + preview).
+for log in golden-sync.log golden-preview.log; do
+  sudo touch "/var/log/$log"
+  sudo chown boxd:boxd "/var/log/$log"
+done
 
-# 6. Install + start the systemd unit.
+# 6. Install + start the systemd unit. `enable --now` won't restart an
+#    already-running service, so explicitly restart to pick up new config.
 echo "==> installing systemd unit"
 sudo cp "$HERE/golden-webhook.service" /etc/systemd/system/golden-webhook.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now golden-webhook.service
+sudo systemctl enable golden-webhook.service
+sudo systemctl restart golden-webhook.service
 
 # 7. Show status + the secret (only on first install / for confirmation).
 echo "==> webhook listener status:"
