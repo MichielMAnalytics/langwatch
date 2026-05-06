@@ -132,14 +132,17 @@ jobs:
       - name: Verify public URL
         run: |
           set -euo pipefail
-          for i in 1 2 3 4 5 6 7 8 9 10; do
+          # 30 tries × 5s sleep = ~5min upper bound, exits at first 2xx/3xx.
+          # Stacks with multi-step cold-starts (Prisma migrate + Zod codegen
+          # + Vite/Next compile) routinely take 60–120s — the previous 10-try
+          # ceiling was tripping false-fail on healthy deploys.
+          for i in $(seq 1 30); do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "https://${BOXD_PUBLIC_HOST}/" --max-time 10 || true)
             echo "try $i: $code"
-            # Accept any 2xx or redirect (apps often 3xx from / to /login etc.)
             if [[ "$code" =~ ^2[0-9][0-9]$ || "$code" =~ ^3[0-9][0-9]$ ]]; then
               exit 0
             fi
             sleep 5
           done
-          echo "${BOXD_PUBLIC_HOST} did not return a 2xx/3xx"
+          echo "${BOXD_PUBLIC_HOST} did not return a 2xx/3xx after ~5min"
           exit 1
