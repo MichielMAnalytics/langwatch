@@ -1,0 +1,27 @@
+[
+  {
+    "id": "deploy",
+    "execute-command": "/home/boxd/langwatch/scripts/golden-sync-webhook.sh",
+    "command-working-directory": "/home/boxd/langwatch",
+    "response-message": "queued",
+    "include-command-output-in-response": false,
+    "trigger-rule": {
+      "and": [
+        {
+          "match": {
+            "type": "payload-hmac-sha256",
+            "secret": "@WEBHOOK_SECRET@",
+            "parameter": { "source": "header", "name": "X-Hub-Signature-256" }
+          }
+        },
+        {
+          "match": {
+            "type": "value",
+            "value": "refs/heads/main",
+            "parameter": { "source": "payload", "name": "ref" }
+          }
+        }
+      ]
+    }
+  }
+]
