@@ -136,7 +136,7 @@ function SignInForm() {
 
   return (
     <>
-      <Box position="fixed" top={4} right={4} zIndex={1}>
+      <Box position="fixed" top={4} left={4} zIndex={1}>
         <BoxdLogoIcon size={36} />
       </Box>
       <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
