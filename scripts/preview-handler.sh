@@ -14,6 +14,35 @@
 set -euo pipefail
 
 LOG=/var/log/golden-preview.log
+BOT_CONF=/etc/boxd-bot.conf
+
+# Mint a 1-hour GitHub App installation token. Comments + reactions
+# posted under this token show as `<app-name>[bot]` in the PR thread.
+# Returns the token on stdout, empty + non-zero on error.
+mint_bot_token() {
+  [ -f "$BOT_CONF" ] || return 1
+  # shellcheck disable=SC1090
+  . "$BOT_CONF"
+  [ -n "${BOXD_BOT_APP_ID:-}" ] && [ -n "${BOXD_BOT_INSTALLATION_ID:-}" ] \
+    && [ -r "${BOXD_BOT_PEM:-}" ] || return 1
+
+  local now header payload b64h b64p sig jwt
+  now=$(date +%s)
+  header='{"alg":"RS256","typ":"JWT"}'
+  payload="{\"iat\":$((now-30)),\"exp\":$((now+540)),\"iss\":$BOXD_BOT_APP_ID}"
+  b64h=$(printf '%s' "$header"  | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+  b64p=$(printf '%s' "$payload" | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+  sig=$(printf '%s.%s' "$b64h" "$b64p" \
+    | openssl dgst -sha256 -sign "$BOXD_BOT_PEM" -binary \
+    | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+  jwt="$b64h.$b64p.$sig"
+
+  curl -sS -X POST \
+    -H "Authorization: Bearer $jwt" \
+    -H "Accept: application/vnd.github+json" \
+    "https://api.github.com/app/installations/$BOXD_BOT_INSTALLATION_ID/access_tokens" \
+    | jq -r '.token // empty'
+}
 
 if [ -t 1 ] || [ "${PREVIEW_FOREGROUND:-0}" = "1" ]; then
   : # already in fg
@@ -32,13 +61,26 @@ COMMENT_ID=${4:?missing arg: comment_id}
 echo
 echo "$(date -u +%FT%TZ) /boxd-preview @$COMMENTER on $REPO#$PR_NUMBER (comment $COMMENT_ID)"
 
+# Mint the GitHub App installation token. Falls back to the user-level
+# gh auth if the bot config is missing or token mint fails — this keeps
+# the script usable in dev even before the App is installed.
+BOT_TOKEN=$(mint_bot_token 2>/dev/null || true)
+if [ -n "$BOT_TOKEN" ]; then
+  echo "  bot identity: GitHub App installation token (boxd-sh[bot])"
+  export GH_TOKEN="$BOT_TOKEN"
+else
+  echo "  bot identity: user (boxd-bot.conf missing or token mint failed)"
+fi
+
 # Eyes reaction — Layer-A already filtered randoms.
 gh api -X POST "repos/$REPO/issues/comments/$COMMENT_ID/reactions" \
   -f content=eyes >/dev/null 2>&1 || echo "  (eyes reaction failed; continuing)"
 
-# Layer-B: precise per-repo permission.
-PERM=$(gh api "repos/$REPO/collaborators/$COMMENTER/permission" --jq '.permission' 2>&1 \
-  || echo "lookup_failed")
+# Layer-B: precise per-repo permission. The App doesn't have
+# Administration:read so we drop GH_TOKEN for this single call and let
+# gh fall back to the user-level auth (~/.config/gh).
+PERM=$(env -u GH_TOKEN gh api "repos/$REPO/collaborators/$COMMENTER/permission" \
+  --jq '.permission' 2>&1 || echo "lookup_failed")
 echo "  permission: $PERM"
 
 case "$PERM" in
