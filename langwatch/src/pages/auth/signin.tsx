@@ -135,7 +135,7 @@ function SignInForm() {
   };
 
   return (
-    <>
+    <Box bg="red.100" minH="100vh">
       <Box position="fixed" top={4} right={4} zIndex={1}>
         <BoxdLogoIcon size={36} />
       </Box>
@@ -204,6 +204,6 @@ function SignInForm() {
         </Card.Root>
       </form>
       </Container>
-    </>
+    </Box>
   );
 }
