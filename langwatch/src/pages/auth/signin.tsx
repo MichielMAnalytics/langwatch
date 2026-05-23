@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { HorizontalFormControl } from "../../components/HorizontalFormControl";
 import { LogoIcon } from "../../components/icons/LogoIcon";
+import { BoxdLogoIcon } from "../../components/icons/BoxdLogoIcon";
 import { toaster } from "../../components/ui/toaster";
 import { usePublicEnv } from "../../hooks/usePublicEnv";
 import { normalizeErrorCode, SignInError } from "./error";
@@ -134,7 +135,11 @@ function SignInForm() {
   };
 
   return (
-    <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
+    <Box bg="pink.100" minH="100vh">
+      <Box position="fixed" top={4} right={4} zIndex={1}>
+        <BoxdLogoIcon size={36} />
+      </Box>
+      <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
       {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card.Root>
@@ -198,6 +203,7 @@ function SignInForm() {
           </Card.Body>
         </Card.Root>
       </form>
-    </Container>
+      </Container>
+    </Box>
   );
 }
