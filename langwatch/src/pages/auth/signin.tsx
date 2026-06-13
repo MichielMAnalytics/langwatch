@@ -134,9 +134,10 @@ function SignInForm() {
   };
 
   return (
-    <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
-      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+    <Box minHeight="100vh" background="pink.100">
+      <Container maxW="container.md" paddingTop="calc(40vh - 164px)">
+        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+        <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card.Root>
           <Card.Header>
             <HStack gap={4}>
@@ -196,8 +197,9 @@ function SignInForm() {
               </HStack>
             </VStack>
           </Card.Body>
-        </Card.Root>
-      </form>
-    </Container>
+          </Card.Root>
+        </form>
+      </Container>
+    </Box>
   );
 }
